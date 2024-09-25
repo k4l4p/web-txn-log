@@ -32,7 +32,7 @@ const App = () => {
 						<code id="transaction-receipt" className="text-sm">
 							{JSON.stringify(
 								txnReceipt,
-								(key, value) => {
+								(_, value) => {
 									if (typeof value === "bigint") {
 										return value.toString()
 									}
