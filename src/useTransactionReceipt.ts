@@ -27,10 +27,48 @@ export const neoXT4 = defineChain({
 	},
 })
 
-const client = createPublicClient({
+export const neox = defineChain({
+	id: 47763,
+	name: "NeoX",
+	nativeCurrency: { name: "GAS", symbol: "GAS", decimals: 18 },
+	rpcUrls: {
+		default: {
+			http: ["https://mainnet-1.rpc.banelabs.org"],
+			webSocket: ["wss://mainnet.wss1.banelabs.org"],
+		},
+	},
+	blockExplorers: {
+		default: {
+			name: "Arbiscan",
+			url: "https://xexplorer.neo.org/",
+			apiUrl: "https://xexplorer.neo.org/api",
+		},
+	},
+	contracts: {
+		multicall3: {
+			address: "0xD6010D102015fEa9cB3a9AbFBB51994c0Fd6E672",
+			blockCreated: 4299,
+		},
+	},
+})
+
+const neoxt4Client = createPublicClient({
 	transport: http(),
 	chain: neoXT4,
 })
+
+const neoxClient = createPublicClient({
+	transport: http(),
+	chain: neox,
+})
+
+const chainMap = { neoxClient, neoxt4Client }
+
+export type ChoosableChain = keyof typeof chainMap
+export const allChainName: Array<ChoosableChain> = [
+	"neoxClient",
+	"neoxt4Client",
+]
 
 interface UseTransactionReceiptReturn {
 	txnReceipt: unknown | null
@@ -46,7 +84,10 @@ function isHexPrefix(value: string): value is `0x${string}` {
 	return value.startsWith("0x")
 }
 
-function useTransactionReceipt(): UseTransactionReceiptReturn {
+function useTransactionReceipt(
+	chainName: ChoosableChain
+): UseTransactionReceiptReturn {
+	const client = chainMap[chainName]
 	const [txnReceipt, setTxnReceipt] = useState<unknown | null>(null)
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [findEntries, setFindEntries] = useState<
@@ -59,6 +100,7 @@ function useTransactionReceipt(): UseTransactionReceiptReturn {
 	const fetch = async (txn: string) => {
 		setIsLoading(true)
 		setFindEntries([])
+		setTxnReceipt(null)
 		try {
 			if (!isHexPrefix(txn)) {
 				throw new Error("Invalid transaction hash")
