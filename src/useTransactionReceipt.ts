@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { createPublicClient, defineChain, http, parseEventLogs } from "viem"
+import { arbitrum } from "viem/chains"
 import { eventEmitterAbi } from "./EventEmitterAbi"
 
 export const neoXT4 = defineChain({
@@ -62,12 +63,18 @@ const neoxClient = createPublicClient({
 	chain: neox,
 })
 
-const chainMap = { neoxClient, neoxt4Client }
+const arbClient = createPublicClient({
+	transport: http(),
+	chain: arbitrum,
+})
+
+const chainMap = { neoxClient, neoxt4Client, arbClient }
 
 export type ChoosableChain = keyof typeof chainMap
 export const allChainName: Array<ChoosableChain> = [
 	"neoxClient",
 	"neoxt4Client",
+	"arbClient",
 ]
 
 interface UseTransactionReceiptReturn {
