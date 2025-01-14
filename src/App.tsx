@@ -15,7 +15,6 @@ const App = () => {
 	const { customError, decode } = useDecodeCustomError()
 	const [tempTxn, setTempTxn] = useState<string>("")
 	const [tempErrorData, setTempErrorData] = useState<string>("")
-	console.log(customError)
 	return (
 		<div className="max-w-7xl mx-auto p-4">
 			<h1 className="text-2xl font-bold mb-4">Transaction Receipt</h1>
@@ -121,6 +120,27 @@ const App = () => {
 			>
 				Decode Error
 			</button>
+			<div className="mt-4">
+				<h2 className="text-lg font-bold mb-2">Error Obj</h2>
+				<pre className="bg-gray-100 p-4 rounded-md overflow-auto max-h-[500px]">
+					{isLoading ? (
+						<p>Loading...</p>
+					) : (
+						<code id="transaction-receipt" className="text-sm">
+							{JSON.stringify(
+								customError,
+								(_, value) => {
+									if (typeof value === "bigint") {
+										return value.toString()
+									}
+									return value
+								},
+								2
+							)}
+						</code>
+					)}
+				</pre>
+			</div>
 		</div>
 	)
 }
